@@ -1,38 +1,87 @@
-.App {
-  text-align: center;
+.table {
+  border: 1px solid #ccc;
+  width: 100%;
+  padding: 0;
+  border-spacing: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.th {
+  width: 30px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.data-text {
+  width: 80px;
+  padding: 10px;
+  display: block;
+  height: 40px;
+  text-align: left;
+  /* border-right: 1px solid #ccc; */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.td.blocked {
+  background-color: rgb(223, 92, 92);
 }
 
-.App-link {
-  color: #61dafb;
+.td.show-border {
+  border-right: 1px solid #ccc;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.tr {
+  border-bottom: 1px solid #ccc;
+}
+
+.body .data-text {
+  /* border-top: 1px solid #ccc; */
+  font-size: 14px;
+}
+
+td {
+  /* border-right: 1px solid #ccc; */
+  border-top: 1px solid #ccc;
+}
+
+.th {
+  /* padding: 10px 0; */
+  border-right: 1px solid #ccc;
+  width: 200px;
+  width: 100%;
+}
+
+
+
+.th,
+.td {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.table.sticky {
+  overflow: scroll;
+}
+
+.table.sticky .header,
+.table.sticky .footer {
+  position: sticky;
+  z-index: 1;
+  width: fit-content;
+}
+
+.table.sticky .header {
+  top: 0;
+}
+
+.table.sticky .footer {
+  bottom: 0;
+}
+
+.table.sticky .body {
+  position: relative;
+  z-index: 0;
+}
+
+.table.sticky [data-sticky-td] {
+  position: sticky;
 }
