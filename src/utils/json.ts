@@ -1,5 +1,5 @@
 export function isJsonString(str: string) {
-  const regex = /\,(?!\s*?[\{\[\"\'\w])/g
+  const regex = /,(?!\s*?[{["'\w])/g
 
   const json = str.trim().replace(regex, "")
 
