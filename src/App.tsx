@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import styled from "styled-components"
 // @ts-ignore
 import {
@@ -11,7 +11,18 @@ import { interpretBlocked } from "./utils/block"
 import { getDates } from "./date"
 import { format } from "date-fns"
 import { removeSpaces } from "./string"
-import GetData from "./GetData"
+import queryString from "query-string"
+import { isJsonString } from "./utils/json"
+
+const Container = styled.div`
+  .error {
+    padding: 20px;
+    font-weight: bold;
+    font-size: 30px;
+    color: red;
+    text-align: center;
+  }
+`
 
 const Styles = styled.div`
   padding: 1rem;
@@ -180,34 +191,35 @@ function Table({ columns, data }: any) {
   )
 }
 
-function App() {
+type Props = {
+  location?: any
+}
+
+function App({ location }: Props) {
+  const [parsedQuery, setParsedQuery] = useState<any>(null)
+
+  const [showDisplay, setShowDisplay] = useState(false)
+  const [data, setData] = useState<any[]>([])
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    const parsedQuery: any = queryString.parse(
+      window.location.search
+    )
+    if (parsedQuery) {
+      const json = parsedQuery.json
+      const isJson = isJsonString(json)
+
+      if (!isJson) return setError(true)
+
+      setDisplay(isJson)
+    }
+  }, [])
+
   const dates = getDates(
     new Date(2022, 8, 11),
     new Date(2023, 8, 1)
   )
-
-  //   const columns = useMemo(
-  //     () =>
-  //       [
-  //         {
-  //           Header: "Name",
-  //           accessor: "name",
-  //           sticky: "left",
-  //         },
-  //       ].concat(
-  //         (dates as any).map((date: any) => {
-  //           const readableDate = format(date, "LLL do")
-  //           return {
-  //             Header: readableDate,
-  //             accessor: removeSpaces(readableDate),
-  //           }
-  //         })
-  //       ),
-  //     []
-  //   )
-
-  const [showDisplay, setShowDisplay] = useState(false)
-  const [data, setData] = useState<any[]>([])
 
   const columns = [
     {
@@ -249,8 +261,8 @@ function App() {
   //   const data = useMemo(() => interpretBlocked(), [])
 
   return (
-    <div>
-      {showDisplay ? (
+    <Container>
+      {/* {showDisplay ? (
         <div className="table">
           <Styles>
             <Table columns={columns} data={data} />
@@ -258,8 +270,18 @@ function App() {
         </div>
       ) : (
         <GetData display={setDisplay} />
+      )} */}
+      {showDisplay && (
+        <Styles>
+          <Table columns={columns} data={data} />
+        </Styles>
       )}
-    </div>
+      {error && (
+        <p className="error">
+          There was an error from the report
+        </p>
+      )}
+    </Container>
   )
 }
 
