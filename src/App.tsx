@@ -196,8 +196,6 @@ type Props = {
 }
 
 function App({ location }: Props) {
-  const [parsedQuery, setParsedQuery] = useState<any>(null)
-
   const [showDisplay, setShowDisplay] = useState(false)
   const [data, setData] = useState<any[]>([])
   const [error, setError] = useState(false)
