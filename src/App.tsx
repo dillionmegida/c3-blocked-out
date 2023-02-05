@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react"
 import styled from "styled-components"
-// @ts-ignore
-import {
-  useTable,
-  useBlockLayout,
-  useResizeColumns,
-} from "react-table"
-import { useSticky } from "react-table-sticky"
+
 import { interpretBlocked } from "./utils/block"
-import { getDates } from "./date"
+import { getDates } from "./utils/date"
 import { format } from "date-fns"
 import { removeSpaces } from "./string"
 import queryString from "query-string"
 import { isJsonString } from "./utils/json"
+import DateRange from "./components/DateRange"
+import Table from "./components/Table"
 
 const Container = styled.div`
   .error {
@@ -47,6 +43,12 @@ const Styles = styled.div`
   .th.date-header {
     font-size: 13px;
     text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #333;
+      color: white;
+    }
   }
 
   .table {
@@ -114,91 +116,21 @@ const Styles = styled.div`
   }
 `
 
-function Table({ columns, data }: any) {
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-    },
-    useBlockLayout,
-    useResizeColumns,
-    useSticky
-  )
-
-  return (
-    <div {...getTableProps()} className="table sticky">
-      <div className="header">
-        {headerGroups.map((headerGroup: any) => (
-          <div
-            {...headerGroup.getHeaderGroupProps()}
-            className="tr"
-          >
-            {headerGroup.headers.map((column: any) => (
-              <div
-                {...column.getHeaderProps()}
-                className={`th ${
-                  column.id !== "name"
-                    ? "date-header"
-                    : "name"
-                }`}
-              >
-                {column.render("Header")}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div {...getTableBodyProps()} className="body">
-        {rows.map((row: any) => {
-          prepareRow(row)
-          return (
-            <div {...row.getRowProps()} className="tr">
-              {row.cells.map((cell: any) => {
-                const cellContent = cell.render(
-                  "Cell"
-                ) as any
-                const hasValue = !!cellContent?.props?.value
-
-                const showValue =
-                  cellContent?.props?.column.id === "name"
-
-                return (
-                  <div
-                    {...cell.getCellProps()}
-                    className={`td ${
-                      !showValue && hasValue
-                        ? "blocked"
-                        : ""
-                    } ${showValue ? "show-border" : ""} ${
-                      !showValue && "date-text"
-                    }`}
-                  >
-                    {showValue && cellContent}
-                  </div>
-                )
-              })}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 type Props = {
   location?: any
 }
+
+const defaultFromDate = new Date()
+const defaultToDate = new Date(2023, 8, 1)
 
 function App({ location }: Props) {
   const [showDisplay, setShowDisplay] = useState(false)
   const [data, setData] = useState<any[]>([])
   const [error, setError] = useState(false)
+
+  const [fromDate, onChangeFromDate] =
+    useState(defaultFromDate)
+  const [toDate, onChangeToDate] = useState(defaultToDate)
 
   useEffect(() => {
     const parsedQuery: any = queryString.parse(
@@ -214,10 +146,7 @@ function App({ location }: Props) {
     }
   }, [])
 
-  const dates = getDates(
-    new Date(2022, 8, 11),
-    new Date(2023, 8, 1)
-  )
+  const dates = getDates(fromDate, toDate)
 
   const columns = [
     {
@@ -231,6 +160,7 @@ function App({ location }: Props) {
       return {
         Header: readableDate,
         accessor: removeSpaces(readableDate),
+        date: date.getTime(),
       }
     })
   )
@@ -251,27 +181,31 @@ function App({ location }: Props) {
     })
 
     const modifiedData = interpretBlocked(sortedWithBlock)
+    // console.log(modifiedData)
 
     setData(modifiedData)
     setShowDisplay(true)
   }
 
-  //   const data = useMemo(() => interpretBlocked(), [])
+  const onSetFromDate = (milliseconds: number) => {
+    onChangeFromDate(new Date(milliseconds))
+  }
 
   return (
     <Container>
-      {/* {showDisplay ? (
-        <div className="table">
-          <Styles>
-            <Table columns={columns} data={data} />
-          </Styles>
-        </div>
-      ) : (
-        <GetData display={setDisplay} />
-      )} */}
+      <DateRange
+        fromDate={fromDate}
+        toDate={toDate}
+        onSetFromDate={onChangeFromDate}
+        onSetToDate={onChangeToDate}
+      />
       {showDisplay && (
         <Styles>
-          <Table columns={columns} data={data} />
+          <Table
+            onSetFromDate={onSetFromDate}
+            columns={columns}
+            data={data}
+          />
         </Styles>
       )}
       {error && (

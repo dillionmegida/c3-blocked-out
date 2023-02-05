@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { getDates } from "../date"
+import { getDates } from "./date"
 import { removeSpaces } from "../string"
 
 export function interpretBlocked(data: any) {
@@ -29,12 +29,14 @@ export function interpretBlocked(data: any) {
               format(new Date(eachDate), "LLL do")
             )
             info[key] = userName
+            info[eachDate.getTime()] = userName
           })
         } else {
           const key = removeSpaces(
             format(new Date(startDate), "LLL do")
           )
           info[key] = userName
+          info[startDate.getTime()] = userName
         }
       })
     }
