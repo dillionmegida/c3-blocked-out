@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import styled from "styled-components"
-
 import { interpretBlocked } from "./utils/block"
 import { getDates } from "./utils/date"
 import { format } from "date-fns"
@@ -17,6 +16,21 @@ const Container = styled.div`
     font-size: 30px;
     color: red;
     text-align: center;
+  }
+
+  .skip-days {
+    margin-left: 14px;
+    display: flex;
+    width: max-content;
+
+    input,
+    label {
+      cursor: pointer;
+    }
+
+    label {
+      padding-left: 5px;
+    }
   }
 `
 
@@ -44,8 +58,10 @@ const Styles = styled.div`
     font-size: 13px;
     text-align: center;
     cursor: pointer;
+    user-select: none;
 
-    &:hover {
+    &:hover,
+    &--hover {
       background-color: #333;
       color: white;
     }
@@ -132,6 +148,8 @@ function App({ location }: Props) {
     useState(defaultFromDate)
   const [toDate, onChangeToDate] = useState(defaultToDate)
 
+  const [showSunday, setShowSunday] = useState(false)
+
   useEffect(() => {
     const parsedQuery: any = queryString.parse(
       window.location.search
@@ -146,7 +164,7 @@ function App({ location }: Props) {
     }
   }, [])
 
-  const dates = getDates(fromDate, toDate)
+  const dates = getDates(fromDate, toDate, 1, showSunday)
 
   const columns = [
     {
@@ -199,6 +217,16 @@ function App({ location }: Props) {
         onSetFromDate={onChangeFromDate}
         onSetToDate={onChangeToDate}
       />
+      <div className="skip-days">
+        <input
+          onChange={() =>
+            setShowSunday((showSunday) => !showSunday)
+          }
+          id="show-sunday"
+          type="checkbox"
+        />
+        <label htmlFor="show-sunday">Show only Sundays</label>
+      </div>
       {showDisplay && (
         <Styles>
           <Table
